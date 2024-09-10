@@ -3,20 +3,29 @@
   <div class="flex flex-col gap-5">
     
     <h1>ARTIFICIAL QUEST</h1>
-    
-    <div class="flex gap-1">
-      <span>ADD NEW PLAYER</span>
-      <input type="text" v-model="newPlayerInput">
-      <button @click="addPlayer()">Add player</button>
-    </div>
   
-    <div v-for="player in players">
-      <span>{{ player }}</span>
+    <div>
+      <span>Evren</span>
       
       <div class="flex gap-3">
-        <span>What will {{ player }} do? </span>
-        <input type="text">
+        <span>What will evren do? </span>
+        <textarea v-model="evrenInput"> </textarea>
       </div>
+    </div>
+    <div>
+      <span>Acho</span>
+      
+      <div class="flex gap-3">
+        <span>What will acho do? </span>
+        <textarea v-model="achoInput"> </textarea>
+      </div>
+    </div>
+
+    <button>Send</button>
+
+    <div>
+      <h3>Response</h3>
+      
     </div>
   </div>
 
@@ -25,12 +34,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const players = ref<string[]>([]);
-const newPlayerInput = ref<string>('');
-
-function addPlayer() {
-  players.value.push(newPlayerInput.value);
-}
+const evrenInput = ref('');
+const achoInput = ref('');
 
 </script>
 

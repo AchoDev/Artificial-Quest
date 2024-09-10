@@ -6,8 +6,7 @@ dotenv.config()
 
 const together = new Together({apiKey: process.env.KEY})
 
-const pl1 = "I will go into the black forest and find the witch's house"
-const pl2 = "I will run to Evren and start violently having sex with him"
+
 
 const res = await together.chat.completions.create({
     messages: [
@@ -35,7 +34,6 @@ const res = await together.chat.completions.create({
 
                 Begin by setting the mood and only the first round. Another message will be sent for every choice the player makes.
             `,
-            type: "text"
         },
         {
             role: "user",
@@ -44,7 +42,6 @@ const res = await together.chat.completions.create({
                 Acho chose to do: "I will follow Evren around, waiting for an oppportunity to knock him out and steal anything he has"
                 Nick chose to do: "I will silently abandon them and follow the path"
             `,
-            type: "Text"
         }
     ],
     // model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
@@ -60,4 +57,6 @@ const res = await together.chat.completions.create({
     stream: false
 })
 
-console.log(res.choices[0].message.content)
+
+
+console.log(res.choices[0].message?.content)
