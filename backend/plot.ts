@@ -13,6 +13,8 @@ export default function getPlot(players: string[], items: string[], desires: str
         The obstacle in these places can be anything. From a simple locked door to a giant monster to a time-space bending reality destroyer or so, to an old woman in a village needing a jar of jam. If this obstacle is violent or not, is up to you. It may be that the players need some sort of information or item to pass this obstacle, this could be in a previous place too or another player could hold that item.
     
         The places are designed by you, half based on player suggestions and the loose story and the other half is up to you. Be as extravagant and creative as you want.
+
+        The players can desire some things to be inside the map somewhere. It's up to you where and how these should appear in the map.
     
         Rounds:
         The game is structured in rounds. Each round a player has to write out what they're going to do. Each round is it's own message. All players have chosen what to do, you evaluate their choices and drive the plot forward.
@@ -63,7 +65,7 @@ export default function getPlot(players: string[], items: string[], desires: str
 
         The players chose these items: ${items.map(i => `"${i}"`).join(", ")}
 
-        The players desire these things somewhere on the map: ${desires.map(d => `"${d}"`).join(", ")}
+        The players desire these things: ${desires.map(d => `"${d}"`).join(", ")}
     
         Begin by setting the mood and only the first round. Another message will be sent for every choice the player makes.
     `
