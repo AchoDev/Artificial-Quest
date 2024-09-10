@@ -1,45 +1,33 @@
 
 <template>
   <div class="flex flex-col gap-5">
-    
-    <h1>ARTIFICIAL QUEST</h1>
-  
-    <div>
-      <span>Evren</span>
-      
-      <div class="flex gap-3">
-        <span>What will evren do? </span>
-        <textarea v-model="evrenInput"> </textarea>
-      </div>
-    </div>
-    <div>
-      <span>Acho</span>
-      
-      <div class="flex gap-3">
-        <span>What will acho do? </span>
-        <textarea v-model="achoInput"> </textarea>
-      </div>
-    </div>
+    <!-- <Game /> -->
 
-    <button>Send</button>
+    <TitleScreen v-if="!gameLogic.lobbyJoined" />
+    <Lobby v-else-if="!gameLogic.gameStarted" />
+    <Game v-else />
 
-    <div>
-      <h3>Response</h3>
-      
-    </div>
   </div>
 
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import Game from './Game.vue';
+import { useGameLogic } from './GameLogic';
+import Lobby from './Lobby.vue';
+import TitleScreen from './TitleScreen.vue'
 
-const evrenInput = ref('');
-const achoInput = ref('');
+const gameLogic = useGameLogic()
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+
+#response-container {
+  width: 700px;
+  height: 700px;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
