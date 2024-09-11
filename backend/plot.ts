@@ -1,6 +1,6 @@
 
 export default function getPlot(players: string[], items: string[], desires: string[]) {
-    `
+    return `
         We are playing a survival game and you are the game master.
         
         This game follows this structure
