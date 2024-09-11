@@ -11,6 +11,7 @@
         "together-ai": "^0.6.0-alpha.4"
     },
     "scripts": {
-        "start": "npx tsc && node dist/server.js"
+        "start": "npx tsc && node dist/server.js",
+        "build": "npx tsc"
     }
 }
