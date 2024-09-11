@@ -56,7 +56,8 @@
     </div>
 
     <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.ChooseAction">
-      <span>What do you choose to do?</span> <input type="text" v-model="action">
+      <span>What do you choose to do?</span> 
+      <textarea type="text" v-model="action" class="w-96 h-36 p-3"></textarea>
       <div>
         <button v-if="!gameLogic.ready" @click="takeAction()">Submit</button>
         <span v-else>You have chosen....</span>

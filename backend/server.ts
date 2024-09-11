@@ -94,12 +94,16 @@ io.on("connection", (socket) => {
         if(players.every(p => p.data.actionTaken)) {
 
             io.emit("game-status", GameStatus.WaitingForAi)
+            gameStatus = GameStatus.WaitingForAi
 
             const res = await takeAction(
                 players.map(p => `${p.data.username} chose to do: ${p.data.actionChosen} \n`).join("")
             )
+
+            players.forEach(p => p.data.actionTaken = false)
+            gameStatus = GameStatus.SeeFate
             io.emit("action-response", res.choices[0].message?.content)
-            console.log(res.choices[0].message)
+            // console.log(res.choices[0].message)
         }
     })
 
@@ -128,6 +132,7 @@ io.on("connection", (socket) => {
                 io.emit("game-status", gameStatus)
                 break
             case GameStatus.ChooseAction:
+                console.log("Settings to WAITING FOR AI")
                 gameStatus = GameStatus.WaitingForAi
                 io.emit("game-status", gameStatus)
                 break

@@ -40,6 +40,8 @@ addSingularLetter(0)
 
 #container {
     width: 700px;
+    max-width: 90%;
+
     height: 400px;
     overflow-y: scroll;
     text-align: left;

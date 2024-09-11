@@ -25,6 +25,7 @@ const gameLogic = useGameLogic()
 
 #response-container {
   width: 700px;
+  max-width: 90%;
   height: 700px;
 }
 
