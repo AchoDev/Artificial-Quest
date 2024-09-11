@@ -32,12 +32,6 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     const ready = ref(false)
 
-    watch(ready, () => {
-        console.log("changed ready to", ready)
-        socket.emit("ready", ready.value)
-        
-    })
-
     function notReady() {
         ready.value = false
         socket.emit("ready", false)
@@ -50,7 +44,7 @@ const useGameLogic = defineStore('gameLogic', () => {
     })
     
     socket.on("action-response", (res) => {
-        console.log("action response!!!")
+        console.log("action response!!!", res)
         notReady()
         currentResponse.value = res;
         gameStatus.value = GameStatus.SeeFate
@@ -134,7 +128,7 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     function setReady() {
         ready.value = true
-        socket.emit("ready")
+        socket.emit("ready", true)
     }
 
     return {

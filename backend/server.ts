@@ -92,10 +92,13 @@ io.on("connection", (socket) => {
         socket.data.actionChosen = action
 
         if(players.every(p => p.data.actionTaken)) {
+
+            io.emit("game-status", GameStatus.WaitingForAi)
+
             const res = await takeAction(
                 players.map(p => `${p.data.username} chose to do: ${p.data.actionChosen} \n`).join("")
             )
-            socket.emit("action-response", res.choices[0].message?.content)
+            io.emit("action-response", res.choices[0].message?.content)
             console.log(res.choices[0].message)
         }
     })
@@ -124,13 +127,15 @@ io.on("connection", (socket) => {
                 gameStatus = GameStatus.ChooseAction
                 io.emit("game-status", gameStatus)
                 break
+            case GameStatus.ChooseAction:
+                gameStatus = GameStatus.WaitingForAi
+                io.emit("game-status", gameStatus)
+                break
             case GameStatus.SeeFate:
+                console.log("fate has been seen")
                 gameStatus = GameStatus.ChooseAction
                 io.emit("game-status", gameStatus)
                 break
-            case GameStatus.ChooseAction:
-                gameStatus = GameStatus.SeeFate
-                io.emit("game-status", gameStatus)
         }
     })
 
@@ -215,7 +220,7 @@ async function updateAI() {
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
         model: "Qwen/Qwen2-72B-Instruct",
-        max_tokens: 100,
+        max_tokens: 512,
         temperature: 1.2,
         top_p: 0.7,
         top_k: 50,
