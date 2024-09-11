@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { io, Socket } from "socket.io-client";
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 enum GameStatus {
     Lobby,
