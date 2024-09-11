@@ -22,7 +22,14 @@ interface Player {
 
 const useGameLogic = defineStore('gameLogic', () => {
     const gameStatus = ref(GameStatus.ChooseAction);
-    const socket: Socket = io("http://localhost:3000");
+    let socket: Socket;
+    
+    if(process.env.LOCAL) {
+        socket = io("http://localhost:80")
+    } else {
+        socket = io("http://44.226.145.213")
+    }
+    
     const currentResponse = ref("");
 
     const lobbyJoined = ref(false)

@@ -21,7 +21,7 @@ let messages: Together.Chat.Completions.CompletionCreateParams.Message[] = []
 const players: Socket[] = []
 let gameStatus = GameStatus.Lobby
 
-const io = new Server(3000, {
+const io = new Server(80, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
