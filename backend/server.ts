@@ -71,6 +71,9 @@ io.on("connection", (socket) => {
         socket.data.id = socket.id
         socket.data.ready = false
 
+        socket.data.itemsChoosen = []
+        socket.data.desireChoosen = ""
+
         players.push(socket)
 
         socket.broadcast.emit("player-joined", msg)
@@ -104,14 +107,30 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("ready", () => {
-        socket.data.ready = true
+    socket.on("ready", value => {
+        socket.data.ready = value
+        console.log("player is ready", socket.data.ready, socket.data.username)
+        console.log(gameStatus)
+
+        if(!players.every(p => p.data.ready)) {
+            console.log("not all players are ready")
+            return
+        } else {
+            console.log("all players are ready")
+        }
 
         switch(gameStatus) {
             case GameStatus.SettingStage:
                 gameStatus = GameStatus.ChooseAction
                 io.emit("game-status", gameStatus)
                 break
+            case GameStatus.SeeFate:
+                gameStatus = GameStatus.ChooseAction
+                io.emit("game-status", gameStatus)
+                break
+            case GameStatus.ChooseAction:
+                gameStatus = GameStatus.SeeFate
+                io.emit("game-status", gameStatus)
         }
     })
 
@@ -134,9 +153,14 @@ io.on("connection", (socket) => {
         if(gameStatus !== GameStatus.ChooseDesire) return
 
         socket.data.desireChoosen = desire
-        console.log("player has chosen desire", socket.data.desireChoosen)
 
-        if(players.every(p => p.data.desireChoosen.length !== '')) {
+        if(desire === '') {
+            socket.data.desireChoosen = "The player has not chosen a desire"
+        }
+
+        console.log("player has chosen desire", players.map(p => p.data))
+
+        if(players.every(p => p.data.desireChoosen.length !== 0)) {
             console.log("all players have chosen desire")
             
             gameStatus = GameStatus.WaitingForAi
@@ -155,6 +179,7 @@ io.on("connection", (socket) => {
 
             const beginning = await updateAI()
 
+            gameStatus = GameStatus.SettingStage
             console.log("beggining", beginning.choices[0].message?.content)
 
             io.emit("beginning", beginning.choices[0].message?.content)
@@ -189,9 +214,9 @@ async function updateAI() {
         // model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
-        model: "databricks/dbrx-instruct",
-        max_tokens: 512,
-        temperature: 2,
+        model: "Qwen/Qwen2-72B-Instruct",
+        max_tokens: 100,
+        temperature: 1.2,
         top_p: 0.7,
         top_k: 50,
         repetition_penalty: 1,

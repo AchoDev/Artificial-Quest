@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { io, Socket } from "socket.io-client";
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 enum GameStatus {
     Lobby,
@@ -21,7 +21,7 @@ interface Player {
 }
 
 const useGameLogic = defineStore('gameLogic', () => {
-    const gameStatus = ref(GameStatus.SettingStage);
+    const gameStatus = ref(GameStatus.ChooseAction);
     const socket: Socket = io("http://localhost:3000");
     const currentResponse = ref("");
 
@@ -32,20 +32,33 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     const ready = ref(false)
 
-    const players = ref<Player[]>([])
+    watch(ready, () => {
+        console.log("changed ready to", ready)
+        socket.emit("ready", ready.value)
+        
+    })
 
+    function notReady() {
+        ready.value = false
+        socket.emit("ready", false)
+    }
+    
+    const players = ref<Player[]>([])
+    
     socket.on("connect", () => {
         console.log("connected", socket.id)
     })
     
     socket.on("action-response", (res) => {
-        // stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+        console.log("action response!!!")
+        notReady()
         currentResponse.value = res;
+        gameStatus.value = GameStatus.SeeFate
     })
 
     socket.on("game-status", (status: GameStatus) => {
         console.log("the status has changes to " + status)
-        
+        notReady()
         gameStatus.value = status
     })
 
@@ -57,13 +70,17 @@ const useGameLogic = defineStore('gameLogic', () => {
         console.log("disconnected")
         lobbyJoined.value = false
         gameStarted.value = false
+        notReady()
     })
 
     socket.on("player-left", (id: string) => {
         console.log("player left", id)
-        console.log("player", players.value)
         players.value = players.value.filter(p => p.id !== id)
+        console.log("player list now", players.value)
         players.value[0].host = true
+        if(players.value[0].id === socket.id) {
+            isHost.value = true
+        }
     })
 
     socket.on("joined-lobby", (playerList: Player[]) => {
@@ -78,6 +95,7 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     socket.on("game-started", () => {
         gameStarted.value = true
+        notReady()
         gameStatus.value = GameStatus.ChooseItems
     })
 
@@ -96,6 +114,7 @@ const useGameLogic = defineStore('gameLogic', () => {
     function takeAction(input: string) {
         console.log("sending choice")
         socket.emit("take-action", input)
+        setReady()
     }
 
     function joinLobby(username: string, char: string) {
@@ -105,19 +124,17 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     function chooseItems(item1: string, item2: string) {
         socket.emit("choose-items", item1, item2)
+        setReady()
     }
-
+    
     function chooseDesire(desire: string) {
         socket.emit("choose-desire", desire)
+        setReady()
     }
 
     function setReady() {
         ready.value = true
         socket.emit("ready")
-    }
-
-    function takeAction(action: string) {
-        socket.emit("take-action", )
     }
 
     return {

@@ -1,6 +1,6 @@
 <template>
 
-<div class="container">
+<div id="container">
 {{ displayedText }}
 </div>
 
@@ -26,7 +26,8 @@ function addSingularLetter(index: number) {
     } else {
         emit('finished')
     }
-  }, 50)
+//   }, 50)
+  }, 0)
 }
 
 console.log(props.text)
@@ -39,9 +40,11 @@ addSingularLetter(0)
 
 #container {
     width: 700px;
-    height: 800px;
+    height: 400px;
     overflow-y: scroll;
     text-align: left;
+    padding: 30px;
+    background: rgb(53, 53, 53);
 }
 
 </style>

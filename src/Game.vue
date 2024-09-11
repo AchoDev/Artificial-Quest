@@ -35,7 +35,8 @@
 
       <textarea type="text" v-model="desire"> </textarea> 
       
-      <button @click="chooseDesire()">Shape reality</button>
+      <button v-if="!gameLogic.ready" @click="chooseDesire()">Shape reality</button>
+      <span v-else>You have desired your desire... waiting for the others to choose</span>
     </div>
 
     <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.WaitingForAi">
@@ -43,8 +44,10 @@
       <span>The Gamemaster is crafting a story....</span>
     </div>
 
-    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage">
-      <h2>The beginning</h2>
+    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage || gameLogic.gameStatus === GameStatus.SeeFate">
+
+      <h2 v-if="gameLogic.gameStatus === GameStatus.SettingStage">The beginning</h2>
+      <h2 v-else>What may your fate be?</h2>
 
       <FateDisplay :text="gameLogic.currentResponse" @finished="canContinue = true"/>
 
@@ -52,10 +55,11 @@
       <button v-if="gameLogic.ready">You are ready... waiting for the others</button>
     </div>
 
-    <div class="flex gap-1" v-else-if="gameLogic.gameStatus === GameStatus.ChooseAction">
+    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.ChooseAction">
       <span>What do you choose to do?</span> <input type="text" v-model="action">
       <div>
-        <button @click="takeAction()">Submit</button>
+        <button v-if="!gameLogic.ready" @click="takeAction()">Submit</button>
+        <span v-else>You have chosen....</span>
       </div>
     </div>
   
@@ -97,7 +101,7 @@ function chooseDesire() {
 }
 
 function takeAction() {
-  gameLogic.takeAction();
+  gameLogic.takeAction(action.value);
 }
 
 </script>
