@@ -35,6 +35,7 @@ interface PlayerInfo {
     actionChosen: string,
     itemsChoosen: string[],
     desireChoosen: string,
+    ready: boolean,
     host: boolean,
     id: string,
 }
@@ -68,6 +69,7 @@ io.on("connection", (socket) => {
         socket.data.host = players.length === 0
         socket.data.actionTaken = false
         socket.data.id = socket.id
+        socket.data.ready = false
 
         players.push(socket)
 
@@ -99,6 +101,17 @@ io.on("connection", (socket) => {
         if(socket.data.host) {
             gameStatus = GameStatus.ChooseItems
             io.emit("game-started")
+        }
+    })
+
+    socket.on("ready", () => {
+        socket.data.ready = true
+
+        switch(gameStatus) {
+            case GameStatus.SettingStage:
+                gameStatus = GameStatus.ChooseAction
+                io.emit("game-status", gameStatus)
+                break
         }
     })
 
@@ -142,6 +155,8 @@ io.on("connection", (socket) => {
 
             const beginning = await updateAI()
 
+            console.log("beggining", beginning.choices[0].message?.content)
+
             io.emit("beginning", beginning.choices[0].message?.content)
         }
     })
@@ -175,7 +190,7 @@ async function updateAI() {
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
         model: "databricks/dbrx-instruct",
-        max_tokens: 200,
+        max_tokens: 512,
         temperature: 2,
         top_p: 0.7,
         top_k: 50,

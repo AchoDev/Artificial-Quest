@@ -30,7 +30,7 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     const isHost = ref(false)
 
-    const currentMessage = ref('')
+    const ready = ref(false)
 
     const players = ref<Player[]>([])
 
@@ -51,6 +51,12 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     socket.on("player-joined", (player: Player) => {
         players.value.push(player)
+    })
+
+    socket.on("disconnect", () => {
+        console.log("disconnected")
+        lobbyJoined.value = false
+        gameStarted.value = false
     })
 
     socket.on("player-left", (id: string) => {
@@ -76,8 +82,11 @@ const useGameLogic = defineStore('gameLogic', () => {
     })
 
     socket.on("beginning", (msg: string) => {
+
+        console.log("msg", msg)
+
         gameStatus.value = GameStatus.SettingStage
-        currentMessage.value = msg
+        currentResponse.value = msg
     })
 
     function startGame() {
@@ -102,6 +111,15 @@ const useGameLogic = defineStore('gameLogic', () => {
         socket.emit("choose-desire", desire)
     }
 
+    function setReady() {
+        ready.value = true
+        socket.emit("ready")
+    }
+
+    function takeAction(action: string) {
+        socket.emit("take-action", )
+    }
+
     return {
         gameStatus,
         socket,
@@ -110,12 +128,15 @@ const useGameLogic = defineStore('gameLogic', () => {
 
         players,
         isHost,
+        ready,
 
         takeAction,
         joinLobby,
         startGame,
         chooseItems,
         chooseDesire,
+        setReady,
+        
 
         currentResponse,
     }

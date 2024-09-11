@@ -46,13 +46,16 @@
     <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage">
       <h2>The beginning</h2>
 
-      <FateDisplay :text="gameLogic.currentResponse" />
+      <FateDisplay :text="gameLogic.currentResponse" @finished="canContinue = true"/>
+
+      <button v-if="canContinue && !gameLogic.ready" @click="gameLogic.setReady()">Continue</button>
+      <button v-if="gameLogic.ready">You are ready... waiting for the others</button>
     </div>
 
     <div class="flex gap-1" v-else-if="gameLogic.gameStatus === GameStatus.ChooseAction">
-      <span>What do you choose to do?</span> <input type="text">
+      <span>What do you choose to do?</span> <input type="text" v-model="action">
       <div>
-        <button @click="">Submit</button>
+        <button @click="takeAction()">Submit</button>
       </div>
     </div>
   
@@ -76,6 +79,9 @@ const itemChosen = ref(false);
 const desire = ref('')
 const desireChosen = ref(false)
 
+const action = ref('')
+
+const canContinue = ref(false)
 
 const gameLogic = useGameLogic()
 
@@ -88,6 +94,10 @@ function chooseItems() {
 function chooseDesire() {
   desireChosen.value = true
   gameLogic.chooseDesire(desire.value);
+}
+
+function takeAction() {
+  gameLogic.takeAction();
 }
 
 </script>
