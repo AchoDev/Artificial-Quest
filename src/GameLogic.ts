@@ -29,7 +29,8 @@ const useGameLogic = defineStore('gameLogic', () => {
         console.log(import.meta.env.LOCAL)
         socket = io("http://localhost:80")
     } else {
-        socket = io("http://44.226.145.213")
+        const ip = "3.75.158.163"
+        socket = io("http://" + ip)
     }
     
     const currentResponse = ref("");
