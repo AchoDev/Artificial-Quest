@@ -7,17 +7,6 @@ import express from "express"
 
 dotenv.config()
 
-const app = express()
-
-app.get("/", (req, res) => {
-    console.log("an request has come")
-    res.send("This is the artificial quest backend!")
-})
-
-app.listen(process.env.PORT || 80, () => {
-    console.log("Server is running on port 3000")
-})
-
 enum GameStatus {
     Lobby,
     ChooseItems,
@@ -33,7 +22,7 @@ let messages: Together.Chat.Completions.CompletionCreateParams.Message[] = []
 const players: Socket[] = []
 let gameStatus = GameStatus.Lobby
 
-const io = new Server(3000, {
+const io = new Server(process.env.PORT as number | undefined || 80, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
