@@ -14,7 +14,7 @@ app.get("/", (req, res) => {
     res.send("This is the artificial quest backend!")
 })
 
-app.listen(3000, () => {
+app.listen(process.env.PORT || 80, () => {
     console.log("Server is running on port 3000")
 })
 
@@ -33,7 +33,7 @@ let messages: Together.Chat.Completions.CompletionCreateParams.Message[] = []
 const players: Socket[] = []
 let gameStatus = GameStatus.Lobby
 
-const io = new Server(80, {
+const io = new Server(3000, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
