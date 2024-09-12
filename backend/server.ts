@@ -13,6 +13,10 @@ app.get("/", (req, res) => {
     res.send("This is the artificial quest backend!")
 })
 
+app.listen(3000, () => {
+    console.log("Server is running on port 3000")
+})
+
 enum GameStatus {
     Lobby,
     ChooseItems,
