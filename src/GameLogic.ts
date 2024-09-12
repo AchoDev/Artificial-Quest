@@ -24,7 +24,9 @@ const useGameLogic = defineStore('gameLogic', () => {
     const gameStatus = ref(GameStatus.ChooseAction);
     let socket: Socket;
     
-    if(process.env.LOCAL) {
+    if(import.meta.env.LOCAL != undefined) {
+        console.log("local app")
+        console.log(import.meta.env.LOCAL)
         socket = io("http://localhost:80")
     } else {
         socket = io("http://44.226.145.213")

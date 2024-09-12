@@ -3,8 +3,15 @@ import dotenv from "dotenv"
 import Together from "together-ai"
 import { Server, Socket } from "socket.io"
 import getPlot from "./plot.js"
+import express from "express"
 
 dotenv.config()
+
+const app = express()
+
+app.get("/", (req, res) => {
+    res.send("This is the artificial quest backend!")
+})
 
 enum GameStatus {
     Lobby,
