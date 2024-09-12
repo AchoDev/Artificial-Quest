@@ -10,6 +10,7 @@ dotenv.config()
 const app = express()
 
 app.get("/", (req, res) => {
+    console.log("an request has come")
     res.send("This is the artificial quest backend!")
 })
 
