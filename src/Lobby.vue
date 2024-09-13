@@ -1,10 +1,10 @@
 <template>
 
-<div class="absolute-center p-3" id="lobby">
+<div class="absolute-center p-3 flex flex-col" id="lobby">
 
     <h3>Lobby</h3>
 
-    <div class="flex gap-1 mb-10">
+    <div class="flex gap-1 flex-wrap justify-center items-center mb-16">
         <div v-for="player in gameLogic.players"  class="size-52 flex flex-col justify-between bg-opacity-25" >
             <PlayerModel :char="player.char" />
             <p>{{ player.username }} {{ player.isYou ? "(You)" : "" }}</p>
@@ -31,6 +31,7 @@ const gameLogic = useGameLogic()
 #lobby {
     width: 700px;
     height: 700px;
+    max-width: 90%;
 }
 
 </style>

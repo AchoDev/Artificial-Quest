@@ -268,7 +268,7 @@ async function updateAI() {
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
         model: "Qwen/Qwen2-72B-Instruct",
-        max_tokens: 512,
+        max_tokens: 1000,
         temperature: 1.2,
         top_p: 0.7,
         top_k: 50,

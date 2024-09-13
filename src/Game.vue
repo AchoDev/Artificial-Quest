@@ -1,6 +1,6 @@
 <template>
 
-  <div>
+  <div id="daddy">
 
     <div class="absolute">
 
@@ -106,3 +106,13 @@ function takeAction() {
 }
 
 </script>
+
+<style scoped lang="scss">
+
+#daddy {
+  max-width: 99dvw;
+
+  width: 90%;
+}
+
+</style>

@@ -40,12 +40,12 @@ addSingularLetter(0)
 
 #container {
     width: 700px;
-    max-width: 90%;
+    max-width: 100%;
 
     height: 400px;
     overflow-y: scroll;
     text-align: left;
-    padding: 30px;
+    padding: 20px;
     background: rgb(53, 53, 53);
 }
 

@@ -129,7 +129,11 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     socket.on("joined-lobby", (playerList: Player[]) => {
         players.value = playerList
-        players.value[players.value.length - 1].isYou = true
+        const you = players.value[players.value.length - 1]
+        you.isYou = true
+        if(you.host) {
+            isHost.value = true
+        }
     })
 
     socket.on("host-info", (host) => {
