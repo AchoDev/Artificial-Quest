@@ -3,8 +3,16 @@
 <div class="flex flex-col gap-5 absolute-center">
     <h1>ARTIFICIAL QUEST</h1>
 
-    <input v-model="usernameInput" placeholder="Username" class="h-12 p-2"/>
-    <button @click="joinLobby()">Join Lobby</button>
+    <div v-if="gameLogic.connected">
+        <input v-model="usernameInput" placeholder="Username" class="h-12 p-2"/>
+        <button @click="joinLobby()">Join Lobby</button>
+    </div>
+
+    <div v-else>
+        <center>
+            Connecting to server...
+        </center>
+    </div>
 
 </div>
 

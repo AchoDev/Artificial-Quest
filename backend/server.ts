@@ -26,7 +26,13 @@ const io = new Server(process.env.PORT as number | undefined || 80, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
-    }
+    },
+    connectionStateRecovery: {
+        maxDisconnectionDuration: 120000,
+        skipMiddlewares: true,
+    },
+    pingInterval: 1000,
+    pingTimeout: 120000,
 })
 
 interface PlayerInfo {
@@ -47,27 +53,16 @@ declare module "socket.io" {
     type SocketData = PlayerInfo;
 }
 
+let kickPlayerTimeout: NodeJS.Timeout
+
+
+
 io.on("connection", (socket) => {
-    console.log("conneceted to", socket.id)
 
-    socket.on("disconnect", () => {
-        console.log("disconnected", socket.id)
-        if(players.length > 0 && players.find(p => p.data.host)?.id === socket.id) {
-            players[0].data.host = true
-            players[0].emit("host-info", true)
-        }
-        players.splice(players.findIndex(p => p.id === socket.id), 1)
-        io.emit("player-left", socket.id)
-
-        if(players.length === 0) {
-            resetGame()
-        }
-    })
-
-    socket.on("player-info", (msg: PlayerInfo) => {
-        socket.data.username = msg.username
-        socket.data.char = msg.char
-        socket.data.host = players.length === 0
+    function setSocket(data: PlayerInfo) {
+        socket.data.username = data.username
+        socket.data.char = data.char
+        socket.data.host = players.length === 1
         socket.data.actionTaken = false
         socket.data.id = socket.id
         socket.data.ready = false
@@ -75,9 +70,56 @@ io.on("connection", (socket) => {
         socket.data.itemsChoosen = []
         socket.data.desireChoosen = ""
 
+        socket.data.token = token
+    }
+
+
+    console.log("conneceted to", socket.id)
+
+    const { token } = socket.handshake.auth
+
+    if(players.find(p => p.data.token === token)) {
+        socket.emit("game-status", gameStatus)
+        
+        if(kickPlayerTimeout != undefined) {
+            clearTimeout(kickPlayerTimeout)
+        }
+        
+        const player = players.find(p => p.data.token === token)
+        
+        setSocket(player?.data)
+        players.push(socket)
+        players.splice(players.findIndex(p => p.id === player?.id), 1)
+        socket.emit("joined-lobby", players.map(p => p.data))
+    }
+
+    socket.on("disconnect", () => {
+        console.log("disconnected", socket.id)
+        if(players.length > 0 && players.find(p => p.data.host)?.id === socket.id) {
+            players[0].data.host = true
+            players[0].emit("host-info", true)
+        }
+        // players.splice(players.findIndex(p => p.id === socket.id), 1)
+        io.emit("player-disconnected", token)
+        kickPlayerTimeout = setTimeout(() => {
+            players.splice(players.findIndex(p => p.id === socket.id), 1)
+            io.emit("player-left", token)
+        }, 120000)
+    })
+
+    socket.on("player-info", (msg: PlayerInfo) => {
+
+        if(socket.recovered) {
+            console.log("player reconnected")
+            socket.emit("game-status", gameStatus)
+            return
+        }
+
         players.push(socket)
 
-        socket.broadcast.emit("player-joined", msg)
+        setSocket(msg)
+
+        socket.broadcast.emit("player-joined", socket.data)
         socket.emit("joined-lobby", players.map(p => p.data))
 
         socket.emit("host-info", socket.data.host)

@@ -15,7 +15,7 @@ enum GameStatus {
 interface Player {
     username: string,
     char: string,
-    id: string,
+    token: string,
     host: boolean,
     isYou: boolean
 }
@@ -23,20 +23,51 @@ interface Player {
 const useGameLogic = defineStore('gameLogic', () => {
     const gameStatus = ref(GameStatus.ChooseAction);
     let socket: Socket;
-    
-    if(import.meta.env.LOCAL != undefined) {
+
+    function generateUUID() {
+        let dt = new Date().getTime();
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            const r = (dt + Math.random()*16)%16 | 0;
+            dt = Math.floor(dt/16);
+            return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+        });
+        return uuid
+    }
+
+
+    if(import.meta.env.DEV) {
         console.log("local app")
         console.log(import.meta.env.LOCAL)
         socket = io("http://localhost:80")
     } else {
+
+        let uuid
+        if(localStorage.getItem("uuid") === null) {
+            uuid = generateUUID()
+            localStorage.setItem("uuid", uuid)
+        } else {
+            uuid = localStorage.getItem("uuid")
+        }
+
         const ip = "artificial-quest.onrender.com/"
-        socket = io("http://" + ip)
+        socket = io("http://" + ip, {
+            reconnection: true,               // Enable automatic reconnection
+            reconnectionAttempts: Infinity,   // Unlimited reconnection attempts
+            reconnectionDelay: 1000,          // Wait 1 second before trying to reconnect
+            reconnectionDelayMax: 5000,       // Maximum delay between reconnections
+            timeout: 20000,
+            auth: {
+                token: uuid
+            }
+        })
     }
     
     const currentResponse = ref("");
 
     const lobbyJoined = ref(false)
     const gameStarted = ref(false)
+
+    const connected = ref(false)
 
     const isHost = ref(false)
 
@@ -51,6 +82,7 @@ const useGameLogic = defineStore('gameLogic', () => {
     
     socket.on("connect", () => {
         console.log("connected", socket.id)
+        connected.value = true
     })
     
     socket.on("action-response", (res) => {
@@ -63,6 +95,12 @@ const useGameLogic = defineStore('gameLogic', () => {
     socket.on("game-status", (status: GameStatus) => {
         console.log("the status has changes to " + status)
         notReady()
+        
+        lobbyJoined.value = true
+
+        if(status !== GameStatus.Lobby) {
+            gameStarted.value = true
+        }
         gameStatus.value = status
     })
 
@@ -77,12 +115,14 @@ const useGameLogic = defineStore('gameLogic', () => {
         notReady()
     })
 
-    socket.on("player-left", (id: string) => {
-        console.log("player left", id)
-        players.value = players.value.filter(p => p.id !== id)
+    socket.on("player-left", (token: string) => {
+        console.log("player left", token)
+        console.log("player list before", players.value)
+        players.value = players.value.filter(p => p.token !== token)
         console.log("player list now", players.value)
         players.value[0].host = true
-        if(players.value[0].id === socket.id) {
+
+        if(players.value[0].token === players.value.find(p => p.isYou)?.token) {
             isHost.value = true
         }
     })
@@ -160,6 +200,7 @@ const useGameLogic = defineStore('gameLogic', () => {
         
 
         currentResponse,
+        connected,
     }
 });
 
