@@ -104,6 +104,7 @@ io.on("connection", (socket) => {
         kickPlayerTimeout = setTimeout(() => {
             players.splice(players.findIndex(p => p.id === socket.id), 1)
             io.emit("player-left", token)
+            console.log("PLAYER TIMEOUT AFTER LEAVING")
         }, 120000)
     })
 
