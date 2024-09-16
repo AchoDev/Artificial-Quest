@@ -83,6 +83,10 @@ const useGameLogic = defineStore('gameLogic', () => {
     socket.on("connect", () => {
         console.log("connected", socket.id)
         connected.value = true
+
+        setTimeout(() => {
+            fetch("http://artificial-quest.onrender.com:3000")
+        }, 1000 * 60 * 10)
     })
     
     socket.on("action-response", (res) => {

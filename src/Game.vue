@@ -103,6 +103,8 @@ function chooseDesire() {
 
 function takeAction() {
   gameLogic.takeAction(action.value);
+
+  action.value = ''
 }
 
 </script>
