@@ -3,7 +3,6 @@ import dotenv from "dotenv"
 import Together from "together-ai"
 import { Server, Socket } from "socket.io"
 import getPlot from "./plot.js"
-import express from "express"
 
 dotenv.config()
 
@@ -53,8 +52,7 @@ declare module "socket.io" {
     type SocketData = PlayerInfo;
 }
 
-let kickPlayerTimeout: NodeJS.Timeout
-
+let kickPlayerTimeouts: {token: string, timeout: NodeJS.Timeout}[] = []
 
 
 io.on("connection", (socket) => {
@@ -80,9 +78,10 @@ io.on("connection", (socket) => {
 
     if(players.find(p => p.data.token === token)) {
         socket.emit("game-status", gameStatus)
-        
-        if(kickPlayerTimeout != undefined) {
-            clearTimeout(kickPlayerTimeout)
+
+        const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
+        if(timeout != undefined) {
+            clearTimeout(timeout)
         }
         
         const player = players.find(p => p.data.token === token)
@@ -101,11 +100,19 @@ io.on("connection", (socket) => {
         }
         // players.splice(players.findIndex(p => p.id === socket.id), 1)
         io.emit("player-disconnected", token)
-        kickPlayerTimeout = setTimeout(() => {
-            players.splice(players.findIndex(p => p.id === socket.id), 1)
-            io.emit("player-left", token)
-            console.log("PLAYER TIMEOUT AFTER LEAVING")
-        }, 120000)
+        kickPlayerTimeouts.push({
+            token: token,
+            timeout: setTimeout(() => {
+                players.splice(players.findIndex(p => p.id === socket.id), 1)
+                io.emit("player-left", token)
+                console.log("PLAYER TIMEOUT AFTER LEAVING")
+
+                if(players.length === 0) {
+                    resetGame()
+                }
+
+            }, 120000)
+        })
     })
 
     socket.on("player-info", (msg: PlayerInfo) => {
@@ -175,11 +182,11 @@ io.on("connection", (socket) => {
                 gameStatus = GameStatus.ChooseAction
                 io.emit("game-status", gameStatus)
                 break
-            case GameStatus.ChooseAction:
-                console.log("Settings to WAITING FOR AI")
-                gameStatus = GameStatus.WaitingForAi
-                io.emit("game-status", gameStatus)
-                break
+            // case GameStatus.ChooseAction:
+            //     console.log("Settings to WAITING FOR AI")
+            //     gameStatus = GameStatus.WaitingForAi
+            //     io.emit("game-status", gameStatus)
+            //     break
             case GameStatus.SeeFate:
                 console.log("fate has been seen")
                 gameStatus = GameStatus.ChooseAction
