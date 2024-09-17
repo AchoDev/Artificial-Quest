@@ -4,19 +4,21 @@ import Together from "together-ai"
 import { Server, Socket } from "socket.io"
 import getPlot from "./plot.js"
 import express from "express"
+import http from "http"
 
 const app = express()
+const server = http.createServer(app)
+dotenv.config()
 
 app.get("/", (req, res) => {
     console.log("GET / request came")
     res.send("Hello World")
 })
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log("Server is running on port 3000")
 })
 
-dotenv.config()
 
 enum GameStatus {
     Lobby,
@@ -33,7 +35,7 @@ let messages: Together.Chat.Completions.CompletionCreateParams.Message[] = []
 const players: Socket[] = []
 let gameStatus = GameStatus.Lobby
 
-const io = new Server(process.env.PORT as number | undefined || 80, {
+const io = new Server(server, {
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
