@@ -12,6 +12,8 @@ dotenv.config()
 
 app.get("/", (req, res) => {
     console.log("GET / request came")
+
+    res.set('Access-Control-Allow-Origin', 'artificial-quest.onrender.com/')
     res.send("Hello World")
 })
 
