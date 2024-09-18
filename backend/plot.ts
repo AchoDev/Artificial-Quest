@@ -80,15 +80,14 @@ export default function getPlot(players: string[], items: string[], desires: str
         Everywhere where is says playername, you will change it to the actual players name
         Everywhere where it says placeindex, you will change it to the actual place index (number)
 
-        In the end you will write a 1 singular sentence, in which will just say each players situation. This will start with /playername. This is to give a quick summary of the players situation. The written out story it it's own thing, this comes on top of that. These summaries are directed to the players themselves, so directly address them.
+        In the end you will write a paragraph, in which will just say each players situation. This is to give a quick summary of the players situation. The written out story it it's own thing, this comes on top of that. These summaries are directed to the players themselves, so directly address them. If the players moved to another place, include that in the summary.
     
         After that you will write out the result of the round as commands. These are the avaiable commands:
     
         /kill playername
         Use the above command to KILL a player. ONLY use this when the player has already died somehow
 
-        /move playername placeindex
-        Use the above command to move a player to another place. ONLY use this when the player has moved to another place
+        DO NOT tell players about the command
 
         ONLY use these commands when either of these events happened. DO NOT Describe them to the players in your responses. DO NOT say them when not nececarry. Again you can ONLY use THESE commands. Do NOT create new ones. By USE I mean writing out these commands.
         Again you will ONLY WRITE these commands IN YOUR RESPONSE when they are nececarry.

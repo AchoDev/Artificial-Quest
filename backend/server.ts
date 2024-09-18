@@ -96,6 +96,10 @@ io.on("connection", (socket) => {
         const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
         if(timeout != undefined) {
             clearTimeout(timeout)
+            kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
+
+            console.log("cleared timeout for player", token)
+            console.log("players: ", players.map(p => p.data))
         }
         
         const player = players.find(p => p.data.token === token)
@@ -114,18 +118,19 @@ io.on("connection", (socket) => {
         }
         // players.splice(players.findIndex(p => p.id === socket.id), 1)
         io.emit("player-disconnected", token)
+
         kickPlayerTimeouts.push({
             token: token,
             timeout: setTimeout(() => {
-                players.splice(players.findIndex(p => p.id === socket.id), 1)
+                console.log("PLAYER TIMEOUT AFTER LEAVING", token)
+                players.splice(players.findIndex(p => p.data.token === socket.data.token), 1)
                 io.emit("player-left", token)
-                console.log("PLAYER TIMEOUT AFTER LEAVING")
 
                 if(players.length === 0) {
                     resetGame()
                 }
 
-            }, 120000)
+            }, 1000 * 120)
         })
     })
 
@@ -146,6 +151,16 @@ io.on("connection", (socket) => {
 
         socket.emit("host-info", socket.data.host)
         socket.emit("game-status", gameStatus)
+    })
+
+    socket.on("leave-lobby", () => {
+        players.splice(players.findIndex(p => p.id === socket.id), 1)
+        io.emit("player-left", token)
+        console.log("player left", token)
+        if(players.length !== 0) {
+            players[0].data.host = true
+            players[0].emit("host-info", true)
+        }
     })
 
     socket.on("take-action", async (action: string) => {

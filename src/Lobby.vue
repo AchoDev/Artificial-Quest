@@ -13,6 +13,7 @@
     </div>
 
     
+    <button @click="gameLogic.leaveLobby()" class="mb-2">Leave lobby</button>
     <button v-show="gameLogic.isHost" @click="gameLogic.startGame()">Start game</button>
 </div>
 

@@ -44,25 +44,28 @@
       <span>The Gamemaster is crafting a story....</span>
     </div>
 
-    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage || gameLogic.gameStatus === GameStatus.SeeFate">
+    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage || gameLogic.gameStatus === GameStatus.SeeFate || gameLogic.gameStatus === GameStatus.ChooseAction">
 
       <h2 v-if="gameLogic.gameStatus === GameStatus.SettingStage">The beginning</h2>
       <h2 v-else>What may your fate be?</h2>
 
       <FateDisplay :text="gameLogic.currentResponse" @finished="canContinue = true"/>
 
-      <button v-if="canContinue && !gameLogic.ready" @click="gameLogic.setReady()">Continue</button>
-      <button v-if="gameLogic.ready">You are ready... waiting for the others</button>
-    </div>
-
-    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.ChooseAction">
-      <span>What do you choose to do?</span> 
-      <textarea type="text" v-model="action" class="w-96 h-36 p-3"></textarea>
-      <div>
-        <button v-if="!gameLogic.ready" @click="takeAction()">Submit</button>
-        <span v-else>You have chosen....</span>
+      <div v-if="gameLogic.gameStatus !== GameStatus.ChooseAction">
+        <button v-if="canContinue && !gameLogic.ready" @click="gameLogic.setReady()">Continue</button>
+        <button v-if="gameLogic.ready">You are ready... waiting for the others</button>
+      </div>
+      
+      <div class="flex flex-col gap-1 items-center" v-if="gameLogic.gameStatus === GameStatus.ChooseAction">
+        <span>What do you choose to do?</span>
+        <textarea type="text" v-model="action" class="w-96 h-52 p-3"></textarea>
+        <div>
+          <button v-if="!gameLogic.ready" @click="takeAction()">Submit</button>
+          <span v-else>You have chosen....</span>
+        </div>
       </div>
     </div>
+
   
     <!-- <div id="response-container"  class="absolute-center bg-white text-black text-start p-5">
       <span>{{ response }}</span>

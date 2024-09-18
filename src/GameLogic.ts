@@ -41,7 +41,6 @@ const useGameLogic = defineStore('gameLogic', () => {
         baseURL = "http://localhost:80"
     } 
         
-    socket = io(baseURL)
     let uuid
     if(localStorage.getItem("uuid") === null) {
         uuid = generateUUID()
@@ -127,7 +126,7 @@ const useGameLogic = defineStore('gameLogic', () => {
         console.log("player list now", players.value)
         if(players.value.length !== 0) {
             players.value[0].host = true
-            
+
             if(players.value[0].token === players.value.find(p => p.isYou)?.token) {
                 isHost.value = true
             }
@@ -178,6 +177,11 @@ const useGameLogic = defineStore('gameLogic', () => {
         lobbyJoined.value = true
     }
 
+    function leaveLobby() {
+        socket.emit("leave-lobby")
+        lobbyJoined.value = false
+    }
+
     function chooseItems(item1: string, item2: string) {
         socket.emit("choose-items", item1, item2)
         setReady()
@@ -205,6 +209,7 @@ const useGameLogic = defineStore('gameLogic', () => {
 
         takeAction,
         joinLobby,
+        leaveLobby,
         startGame,
         chooseItems,
         chooseDesire,
