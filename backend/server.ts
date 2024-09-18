@@ -95,8 +95,12 @@ io.on("connection", (socket) => {
 
         const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
         if(timeout != undefined) {
-            clearTimeout(timeout)
-            kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
+            kickPlayerTimeouts.forEach(t => {
+                if(t.token === token) {
+                    clearTimeout(timeout)
+                    kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
+                }
+            })
 
             console.log("cleared timeout for player", token)
             console.log("players: ", players.map(p => p.data))
@@ -304,7 +308,8 @@ async function updateAI() {
         // model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
-        model: "Qwen/Qwen2-72B-Instruct",
+        // model: "Qwen/Qwen2-72B-Instruct",
+        model: "google/gemma-2-27b-it",
         max_tokens: 1000,
         temperature: 1.2,
         top_p: 0.7,
