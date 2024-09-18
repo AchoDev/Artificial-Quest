@@ -23,6 +23,7 @@ interface Player {
 const useGameLogic = defineStore('gameLogic', () => {
     const gameStatus = ref(GameStatus.ChooseAction);
     let socket: Socket;
+    let baseURL = "http://artificial-quest.onrender.com/"
 
     function generateUUID() {
         let dt = new Date().getTime();
@@ -37,30 +38,29 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     if(import.meta.env.DEV) {
         console.log("local app")
-        console.log(import.meta.env.LOCAL)
-        socket = io("http://localhost:80")
+        baseURL = "http://localhost:80"
+    } 
+        
+    socket = io(baseURL)
+    let uuid
+    if(localStorage.getItem("uuid") === null) {
+        uuid = generateUUID()
+        localStorage.setItem("uuid", uuid)
     } else {
-
-        let uuid
-        if(localStorage.getItem("uuid") === null) {
-            uuid = generateUUID()
-            localStorage.setItem("uuid", uuid)
-        } else {
-            uuid = localStorage.getItem("uuid")
-        }
-
-        const ip = "artificial-quest.onrender.com/"
-        socket = io("http://" + ip, {
-            reconnection: true,               // Enable automatic reconnection
-            reconnectionAttempts: Infinity,   // Unlimited reconnection attempts
-            reconnectionDelay: 1000,          // Wait 1 second before trying to reconnect
-            reconnectionDelayMax: 5000,       // Maximum delay between reconnections
-            timeout: 20000,
-            auth: {
-                token: uuid
-            }
-        })
+        uuid = localStorage.getItem("uuid")
     }
+
+    socket = io(baseURL, {
+        reconnection: true,               // Enable automatic reconnection
+        reconnectionAttempts: Infinity,   // Unlimited reconnection attempts
+        reconnectionDelay: 1000,          // Wait 1 second before trying to reconnect
+        reconnectionDelayMax: 5000,       // Maximum delay between reconnections
+        timeout: 20000,
+        auth: {
+            token: uuid
+        }
+    })
+    
     
     const currentResponse = ref("");
 
@@ -84,9 +84,9 @@ const useGameLogic = defineStore('gameLogic', () => {
         console.log("connected", socket.id)
         connected.value = true
         
-        fetch("http://artificial-quest.onrender.com/")
+        fetch(baseURL)
         setTimeout(() => {
-            fetch("http://artificial-quest.onrender.com/")
+            fetch(baseURL)
         }, 1000 * 60 * 10)
     })
     
@@ -125,11 +125,14 @@ const useGameLogic = defineStore('gameLogic', () => {
         console.log("player list before", players.value)
         players.value = players.value.filter(p => p.token !== token)
         console.log("player list now", players.value)
-        players.value[0].host = true
-
-        if(players.value[0].token === players.value.find(p => p.isYou)?.token) {
-            isHost.value = true
+        if(players.value.length !== 0) {
+            players.value[0].host = true
+            
+            if(players.value[0].token === players.value.find(p => p.isYou)?.token) {
+                isHost.value = true
+            }
         }
+
     })
 
     socket.on("joined-lobby", (playerList: Player[]) => {
