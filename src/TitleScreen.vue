@@ -1,13 +1,13 @@
 <template>
 
-<div class="flex flex-col gap-5 absolute-center">
+<div class="flex flex-col gap-5 absolute-center" id="title-container">
     <h1>ARTIFICIAL QUEST</h1>
 
     <div v-if="gameLogic.connected" class="flex flex-col justify-center items-center">
 
         <span>Select character</span>
 
-        <div class="flex pb-10 overflow-x-scroll overflow-y-hidden h-auto w-2/4">
+        <div class="flex pb-10 overflow-x-scroll overflow-y-hidden h-auto w-full sm:w-2/4">
             <div v-for="char in ['acho', 'evren', 'hamza', 'leo', 'marcel', 'nick']" @click="selectedChar = char" class="size-52 flex flex-col justify-between bg-opacity-25 flex-shrink-0 cursor-pointer" :class="{'bg-white': selectedChar === char}">
                 <PlayerModel :char="char" />
                 <p>{{ char }}</p>
@@ -52,4 +52,14 @@ function joinLobby() {
 </script>
 
 <style scoped lang="scss">
+
+#title-container {
+    width: 700px;
+
+    @media screen and (max-width: 700px) {
+        width: 100dvw;
+        padding: 10px;
+    }
+}
+
 </style>

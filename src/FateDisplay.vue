@@ -26,8 +26,8 @@ function addSingularLetter(index: number) {
     } else {
         emit('finished')
     }
-//   }, 50)
-  }, 0)
+  }, 50)
+  // }, 0)
 }
 
 console.log(props.text)

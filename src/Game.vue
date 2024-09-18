@@ -2,6 +2,10 @@
 
   <div id="daddy">
 
+    <button @click="gameLogic.leaveLobby()" class="absolute top-1 left-1 size-14 flex-center text-center">
+      leave
+    </button>
+
     <div class="absolute">
 
     </div>
@@ -44,7 +48,7 @@
       <span>The Gamemaster is crafting a story....</span>
     </div>
 
-    <div class="flex flex-col gap-1" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage || gameLogic.gameStatus === GameStatus.SeeFate || gameLogic.gameStatus === GameStatus.ChooseAction">
+    <div class="flex flex-col gap-1 justify-center w-full" v-else-if="gameLogic.gameStatus === GameStatus.SettingStage || gameLogic.gameStatus === GameStatus.SeeFate || gameLogic.gameStatus === GameStatus.ChooseAction">
 
       <h2 v-if="gameLogic.gameStatus === GameStatus.SettingStage">The beginning</h2>
       <h2 v-else>What may your fate be?</h2>
@@ -58,7 +62,7 @@
       
       <div class="flex flex-col gap-1 items-center" v-if="gameLogic.gameStatus === GameStatus.ChooseAction">
         <span>What do you choose to do?</span>
-        <textarea type="text" v-model="action" class="w-96 h-52 p-3"></textarea>
+        <textarea type="text" v-model="action" class="w-96 h-52 p-3 max-w-full"></textarea>
         <div>
           <button v-if="!gameLogic.ready" @click="takeAction()">Submit</button>
           <span v-else>You have chosen....</span>
@@ -117,7 +121,10 @@ function takeAction() {
 #daddy {
   max-width: 99dvw;
 
-  width: 90%;
+  width: 100%;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 </style>
