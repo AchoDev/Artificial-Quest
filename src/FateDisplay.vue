@@ -1,14 +1,12 @@
 <template>
 
-<div id="container">
-{{ displayedText }}
+<div id="container" v-html="displayedText">
 </div>
 
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-
 
 const props = defineProps<{
     text: string
@@ -47,6 +45,8 @@ addSingularLetter(0)
     text-align: left;
     padding: 20px;
     background: rgb(53, 53, 53);
+    
+    white-space: pre-wrap;
 }
 
 </style>

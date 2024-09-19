@@ -72,6 +72,8 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     const ready = ref(false)
 
+    const selectedScenario = ref(0)
+
     function notReady() {
         ready.value = false
         socket.emit("ready", false)
@@ -92,15 +94,14 @@ const useGameLogic = defineStore('gameLogic', () => {
     socket.on("action-response", (res) => {
         console.log("action response!!!", res)
         notReady()
-        currentResponse.value = res;
+        // turn all \n into <br> for html
+        currentResponse.value = new RegExp("\n", "g").test(res) ? res.replace(/\n/g, "<br>") : res;
         gameStatus.value = GameStatus.SeeFate
     })
 
     socket.on("game-status", (status: GameStatus) => {
         console.log("the status has changes to " + status)
         notReady()
-        
-        lobbyJoined.value = true
 
         if(status !== GameStatus.Lobby) {
             gameStarted.value = true
@@ -114,9 +115,7 @@ const useGameLogic = defineStore('gameLogic', () => {
 
     socket.on("disconnect", () => {
         console.log("disconnected")
-        lobbyJoined.value = false
-        gameStarted.value = false
-        notReady()
+        connected.value = false
     })
 
     socket.on("player-left", (token: string) => {
@@ -132,6 +131,10 @@ const useGameLogic = defineStore('gameLogic', () => {
             }
         }
 
+    })
+
+    socket.on("change-scenario", (scenario: number) => {
+        selectedScenario.value = scenario
     })
 
     socket.on("joined-lobby", (playerList: Player[]) => {
@@ -162,8 +165,14 @@ const useGameLogic = defineStore('gameLogic', () => {
         currentResponse.value = msg
     })
 
-    function startGame() {
-        socket.emit("start-game")
+    function setScenario(scenario: number) {
+        selectedScenario.value = scenario
+        socket.emit("set-scenario", selectedScenario.value)
+    }
+
+    function startGame(story: string) {
+        console.log("story", story)
+        socket.emit("start-game", story)
     }
 
     function takeAction(input: string) {
@@ -206,6 +215,7 @@ const useGameLogic = defineStore('gameLogic', () => {
         players,
         isHost,
         ready,
+        selectedScenario,
 
         takeAction,
         joinLobby,
@@ -214,6 +224,7 @@ const useGameLogic = defineStore('gameLogic', () => {
         chooseItems,
         chooseDesire,
         setReady,
+        setScenario,
         
 
         currentResponse,

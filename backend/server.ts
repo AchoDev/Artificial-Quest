@@ -33,6 +33,8 @@ enum GameStatus {
 const together = new Together({apiKey: process.env.KEY})
 let messages: Together.Chat.Completions.CompletionCreateParams.Message[] = []
 const players: Socket[] = []
+let story: string = ""
+let selectedScenario: number = 0
 let gameStatus = GameStatus.Lobby
 
 const io = new Server(server, {
@@ -70,7 +72,6 @@ let kickPlayerTimeouts: {token: string, timeout: NodeJS.Timeout}[] = []
 
 
 io.on("connection", (socket) => {
-
     function setSocket(data: PlayerInfo) {
         socket.data.username = data.username
         socket.data.char = data.char
@@ -90,29 +91,34 @@ io.on("connection", (socket) => {
 
     const { token } = socket.handshake.auth
 
-    if(players.find(p => p.data.token === token)) {
-        socket.emit("game-status", gameStatus)
-
-        const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
-        if(timeout != undefined) {
-            kickPlayerTimeouts.forEach(t => {
-                if(t.token === token) {
-                    clearTimeout(timeout)
-                    kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
-                }
-            })
-
-            console.log("cleared timeout for player", token)
-            console.log("players: ", players.map(p => p.data))
-        }
+    socket.emit("game-status", gameStatus)
+    
+    function clearTimeouts() {
+        if(players.find(p => p.data.token === token)) {
+            const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
+            if(timeout != undefined) {
+                kickPlayerTimeouts.forEach(t => {
+                    if(t.token === token) {
+                        clearTimeout(timeout)
+                        kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
+                    }
+                })
+    
+                console.log("cleared timeout for player", token)
+                console.log("players: ", players.map(p => p.data))
+            }
+            const player = players.find(p => p.data.token === token)
         
-        const player = players.find(p => p.data.token === token)
-        
-        setSocket(player?.data)
-        players.push(socket)
-        players.splice(players.findIndex(p => p.id === player?.id), 1)
-        socket.emit("joined-lobby", players.map(p => p.data))
+            setSocket(player?.data)
+            players.push(socket)
+            players.splice(players.findIndex(p => p.id === player?.id), 1)
+            socket.emit("joined-lobby", players.map(p => p.data))
+            socket.emit("change-scenario", selectedScenario)
+        }   
     }
+    
+    
+    clearTimeouts()
 
     socket.on("disconnect", () => {
         console.log("disconnected", socket.id)
@@ -165,6 +171,15 @@ io.on("connection", (socket) => {
             players[0].data.host = true
             players[0].emit("host-info", true)
         }
+
+        if(players.length === 0) {
+            resetGame()
+        }
+    })
+
+    socket.on("change-scenario", (scenario: number) => {
+        selectedScenario = scenario
+        io.emit("change-scenario", scenario)
     })
 
     socket.on("take-action", async (action: string) => {
@@ -191,14 +206,16 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("start-game", () => {
+    socket.on("start-game", (setStory: string) => {
         if(socket.data.host) {
             gameStatus = GameStatus.ChooseItems
             io.emit("game-started")
+            story = setStory
         }
     })
 
     socket.on("ready", value => {
+        clearTimeouts()
         socket.data.ready = value
         console.log("player is ready", socket.data.ready, socket.data.username)
         console.log(gameStatus)
@@ -243,6 +260,8 @@ io.on("connection", (socket) => {
         }
     })
 
+    
+
     socket.on("choose-desire", async (desire) => {
         if(gameStatus !== GameStatus.ChooseDesire) return
 
@@ -266,7 +285,8 @@ io.on("connection", (socket) => {
                     content: getPlot(
                         players.map(p => p.data.username),
                         players.map(p => p.data.itemsChoosen).flat(),
-                        players.map(p => p.data.desireChoosen)
+                        players.map(p => p.data.desireChoosen),
+                        story
                     )
                 }
             ]
@@ -311,7 +331,7 @@ async function updateAI() {
         // model: "Qwen/Qwen2-72B-Instruct",
         model: "google/gemma-2-27b-it",
         max_tokens: 1000,
-        temperature: 1.2,
+        temperature: 1.3,
         top_p: 0.7,
         top_k: 50,
         repetition_penalty: 1,
@@ -323,6 +343,34 @@ async function updateAI() {
         role: "assistant",
         content: res.choices[0].message?.content ?? "No response"
     })
+
+    if(messages.length > 5) {
+
+        const summaryQuery = messages.slice(0, messages.length - 5)
+        summaryQuery.push({
+            role: "user",
+            content: "This was the flow of the game up until now. Summarize the last message you wrote. The summary should be between 50 and 70 tokens and include only the most important details needed to understand this part of the story. Focus on key actions, character motivations, and major plot points."
+        })
+
+        const resSummary = await together.chat.completions.create({
+            messages: summaryQuery,
+            model: "google/gemma-2-27b-it",
+            max_tokens: 70,
+            temperature: 1.3,
+            top_p: 0.7,
+            top_k: 50,
+            repetition_penalty: 1,
+            stop: ["<|eot_id|>","<|eom_id|>"],
+            stream: false
+        })
+    
+        messages.splice(messages.length - 5, 1, {
+            role: "assistant",
+            content: resSummary.choices[0].message!.content!
+        })
+    }
+
+    console.log("messages: ", messages)
 
     return res
 }

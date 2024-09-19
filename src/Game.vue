@@ -2,9 +2,20 @@
 
   <div id="daddy">
 
-    <button @click="gameLogic.leaveLobby()" class="absolute top-1 left-1 size-14 flex-center text-center">
-      leave
-    </button>
+    <div class="absolute top-1 left-1 size-14 flex-center flex-row">
+      <button @click="gameLogic.leaveLobby()" class="text-center">
+        leave
+      </button>
+      <button @click="canContinue = true" v-if="devMode">
+        skip
+      </button>
+    </div>
+
+
+
+    <div class="absolute size-full bg-black bg-opacity-60 flex-center transition-opacity pointer-events-none opacity-0" :class="{'opacity-100': gameLogic.connected === false}">
+      Reconnecting...
+    </div>
 
     <div class="absolute">
 
@@ -83,6 +94,7 @@
 import { ref } from 'vue';
 import { useGameLogic, GameStatus } from './GameLogic';
 import FateDisplay from './FateDisplay.vue';
+import { computed } from 'vue';
 
 const item1 = ref('');
 const item2 = ref('');
@@ -97,6 +109,7 @@ const canContinue = ref(false)
 
 const gameLogic = useGameLogic()
 
+const devMode = computed(() => import.meta.env.DEV)
 
 function chooseItems() {
   itemChosen.value = true
