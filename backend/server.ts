@@ -221,10 +221,10 @@ io.on("connection", (socket) => {
         console.log(gameStatus)
 
         if(!players.every(p => p.data.ready)) {
-            console.log("not all players are ready")
+            console.log("not all players are ready playwer count", players.length)
             return
         } else {
-            console.log("all players are ready")
+            console.log("all players are ready player count", players.length)
         }
 
         switch(gameStatus) {
