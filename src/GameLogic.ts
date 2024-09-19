@@ -86,9 +86,9 @@ const useGameLogic = defineStore('gameLogic', () => {
         connected.value = true
         
         fetch(baseURL)
-        setTimeout(() => {
+        setInterval(() => {
             fetch(baseURL)
-        }, 1000 * 60 * 10)
+        }, 1000 * 60 * 5)
     })
     
     socket.on("action-response", (res) => {
