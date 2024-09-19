@@ -99,7 +99,7 @@ io.on("connection", (socket) => {
             if(timeout != undefined) {
                 kickPlayerTimeouts.forEach(t => {
                     if(t.token === token) {
-                        clearTimeout(timeout)
+                        clearTimeout(t.timeout)
                         kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
                     }
                 })
