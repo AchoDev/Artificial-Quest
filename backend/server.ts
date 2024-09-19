@@ -107,15 +107,16 @@ io.on("connection", (socket) => {
                 console.log("cleared timeout for player", token)
                 console.log("players: ", players.map(p => p.data))
             }
-            const player = players.find(p => p.data.token === token)
-        
-            setSocket(player?.data)
-            players.push(socket)
-            players.splice(players.findIndex(p => p.id === player?.id), 1)
-            socket.emit("joined-lobby", players.map(p => p.data))
-            socket.emit("change-scenario", selectedScenario)
         }   
     }
+
+    const player = players.find(p => p.data.token === token)
+
+    setSocket(player?.data)
+    players.push(socket)
+    players.splice(players.findIndex(p => p.id === player?.id), 1)
+    socket.emit("joined-lobby", players.map(p => p.data))
+    socket.emit("change-scenario", selectedScenario)
     
     
     clearTimeouts()
@@ -215,6 +216,7 @@ io.on("connection", (socket) => {
     })
 
     socket.on("ready", value => {
+        clearTimeouts()
         socket.data.ready = value
         console.log("player is ready", socket.data.ready, socket.data.username)
         console.log(gameStatus)
