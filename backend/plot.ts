@@ -91,6 +91,10 @@ export default function getPlot(players: string[], items: string[], desires: str
         ONLY use these commands when either of these events happened. DO NOT Describe them to the players in your responses. DO NOT say them when not nececarry. Again you can ONLY use THESE commands. Do NOT create new ones. By USE I mean writing out these commands.
         Again you will ONLY WRITE these commands IN YOUR RESPONSE when they are nececarry.
 
+        In the end include a message of how many tokens all messages so far have taken up. Write it like this:
+
+        Tokens so far: (count)
+
         Let's begin.
         First, the players
 

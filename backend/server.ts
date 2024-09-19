@@ -349,7 +349,7 @@ async function updateAI() {
         const summaryQuery = messages.slice(0, messages.length - 5)
         summaryQuery.push({
             role: "user",
-            content: "This was the flow of the game up until now. Summarize the last message you wrote. The summary should be between 50 and 70 tokens and include only the most important details needed to understand this part of the story. Focus on key actions, character motivations, and major plot points."
+            content: "This was the flow of the game up until now. Summarize the last message you wrote. The summary should be between 50 and 70 tokens and include only the most important details needed to understand this part of the story. Focus on key actions, character motivations, and major plot points. Do not add new things or create new details that were not there before"
         })
 
         const resSummary = await together.chat.completions.create({
