@@ -94,29 +94,24 @@ io.on("connection", (socket) => {
     socket.emit("game-status", gameStatus)
     
     function clearTimeouts() {
-        if(players.find(p => p.data.token === token)) {
-            const timeout = kickPlayerTimeouts.find(t => t.token === token)?.timeout
-            if(timeout != undefined) {
-                kickPlayerTimeouts.forEach(t => {
-                    if(t.token === token) {
-                        clearTimeout(t.timeout)
-                        kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
-                    }
-                })
-    
+        kickPlayerTimeouts.forEach(t => {
+            if(t.token === token) {
+                clearTimeout(t.timeout)
+                kickPlayerTimeouts.splice(kickPlayerTimeouts.findIndex(t => t.token === token), 1)
                 console.log("cleared timeout for player", token)
-                console.log("players: ", players.map(p => p.data))
             }
-        }   
+        })  
     }
 
-    const player = players.find(p => p.data.token === token)
-
-    setSocket(player?.data)
-    players.push(socket)
-    players.splice(players.findIndex(p => p.id === player?.id), 1)
-    socket.emit("joined-lobby", players.map(p => p.data))
-    socket.emit("change-scenario", selectedScenario)
+    if(players.find(p => p.data.token === token)) {
+        const player = players.find(p => p.data.token === token)
+    
+        setSocket(player?.data)
+        players.push(socket)
+        players.splice(players.findIndex(p => p.id === player?.id), 1)
+        socket.emit("joined-lobby", players.map(p => p.data))
+        socket.emit("change-scenario", selectedScenario)
+    }
     
     
     clearTimeouts()
