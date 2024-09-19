@@ -215,7 +215,6 @@ io.on("connection", (socket) => {
     })
 
     socket.on("ready", value => {
-        clearTimeouts()
         socket.data.ready = value
         console.log("player is ready", socket.data.ready, socket.data.username)
         console.log(gameStatus)
