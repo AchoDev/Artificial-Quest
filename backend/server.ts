@@ -177,7 +177,7 @@ io.on("connection", (socket) => {
         }
     })
 
-    socket.on("change-scenario", (scenario: number) => {
+    socket.on("set-scenario", (scenario: number) => {
         selectedScenario = scenario
         io.emit("change-scenario", scenario)
     })

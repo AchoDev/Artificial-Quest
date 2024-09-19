@@ -134,6 +134,7 @@ const useGameLogic = defineStore('gameLogic', () => {
     })
 
     socket.on("change-scenario", (scenario: number) => {
+        console.log("scenario changes to", scenario)
         selectedScenario.value = scenario
     })
 
