@@ -325,8 +325,8 @@ async function updateAI() {
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
         // model: "Qwen/Qwen2-72B-Instruct",
-        // model: "google/gemma-2-27b-it",
-        model: "NousResearch/Nous-Hermes-2-Yi-34B",
+        model: "google/gemma-2-27b-it",
+        // model: "NousResearch/Nous-Hermes-2-Yi-34B",
         max_tokens: 1000,
         temperature: 1.3,
         top_p: 0.7,
@@ -351,8 +351,8 @@ async function updateAI() {
 
         const resSummary = await together.chat.completions.create({
             messages: summaryQuery,
-            // model: "google/gemma-2-27b-it",
-            model: "NousResearch/Nous-Hermes-2-Yi-34B",
+            model: "google/gemma-2-27b-it",
+            // model: "NousResearch/Nous-Hermes-2-Yi-34B",
             max_tokens: 70,
             temperature: 1.3,
             top_p: 0.7,
