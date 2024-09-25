@@ -19,6 +19,10 @@ defineProps<{
 <style scoped lang="scss">
 
 #player {
+    
+    transform-origin: bottom center;
+    animation: idle 2s infinite;
+
     @keyframes idle {
         0% {
             transform: scaleY(1);
@@ -30,9 +34,6 @@ defineProps<{
             transform: scaleY(1);
         }
     }
-
-    animation: idle 2s infinite;
-    transform-origin: bottom center;
 }
 
 </style>
