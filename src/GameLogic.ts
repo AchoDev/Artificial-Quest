@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { io, Socket } from "socket.io-client";
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 enum GameStatus {
     Lobby,
@@ -207,6 +207,20 @@ const useGameLogic = defineStore('gameLogic', () => {
         socket.emit("ready", true)
     }
 
+    async function getGameData() {
+        return await fetch(baseURL + "/get-game-data", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            return data
+        })
+    }
+
+
     return {
         gameStatus,
         socket,
@@ -226,6 +240,7 @@ const useGameLogic = defineStore('gameLogic', () => {
         chooseDesire,
         setReady,
         setScenario,
+        getGameData,
         
 
         currentResponse,
@@ -233,4 +248,5 @@ const useGameLogic = defineStore('gameLogic', () => {
     }
 });
 
-export {useGameLogic, GameStatus}
+export { GameStatus, useGameLogic };
+

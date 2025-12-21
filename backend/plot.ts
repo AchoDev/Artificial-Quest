@@ -79,7 +79,7 @@ export default function getPlot(players: string[], items: string[], desires: str
         Response layout:
         In your first response, you will write an introduction to the game (around 3-4 sentences). It will be along the lines of introducing them to the game and their upcoming fate. In this beginning, you will give a small very vague comment about the items and desires and say how it may influence the game. DO NOT REVEAL the actual items chosen or the desires. Just give a small hint about them.
     
-        Then you will move on to telling the story of the last round and what happened. Keep the plot moving at a moderate amount of speed and don't rush it.
+        Then you will move on to telling the story of the last round and what happened. Keep the plot moving at a moderate amount of speed and don't rush it. This message is global to all players and since they cannot see the other players actions, you will need to describe what they do. 
     
         After that you will write out the result of the round as commands. These are the avaiable commands:
     

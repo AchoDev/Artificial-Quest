@@ -1,10 +1,10 @@
 
 import dotenv from "dotenv"
-import Together from "together-ai"
-import { Server, Socket } from "socket.io"
-import getPlot from "./plot.js"
 import express from "express"
 import http from "http"
+import { Server, Socket } from "socket.io"
+import Together from "together-ai"
+import getPlot from "./plot.js"
 
 const app = express()
 const server = http.createServer(app)
@@ -14,6 +14,11 @@ app.get("/", (req, res) => {
     console.log("GET / request came")
     res.setHeader("Access-Control-Allow-Origin", "*")
     res.send("Hello World")
+})
+
+app.get("/get-game-data", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*")
+    res.json(messages)
 })
 
 server.listen(process.env.PORT, () => {
@@ -319,13 +324,17 @@ async function takeAction(action: string) {
 }
 
 async function updateAI() {
+
+    const aiModel = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+
     const res = await together.chat.completions.create({
         messages: messages,
         // model: "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo",
         // model: "mistralai/Mixtral-8x22B-Instruct-v0.1",
         // model: "Qwen/Qwen2-72B-Instruct",
         // model: "Qwen/Qwen2-72B-Instruct",
-        model: "google/gemma-2-27b-it",
+        // model: "google/gemma-2-27b-it",
+        model: aiModel,
         // model: "NousResearch/Nous-Hermes-2-Yi-34B",
         max_tokens: 1000,
         temperature: 1.3,
@@ -341,32 +350,32 @@ async function updateAI() {
         content: res.choices[0].message?.content ?? "No response"
     })
 
-    if(messages.length > 5) {
+    // if(messages.length > 5) {
 
-        const summaryQuery = messages.slice(0, messages.length - 5)
-        summaryQuery.push({
-            role: "user",
-            content: "This was the flow of the game up until now. Summarize the last message you wrote. The summary should be between 50 and 70 tokens and include only the most important details needed to understand this part of the story. Focus on key actions, character motivations, and major plot points. Do not add new things or create new details that were not there before"
-        })
+    //     const summaryQuery = messages.slice(0, messages.length - 5)
+    //     summaryQuery.push({
+    //         role: "user",
+    //         content: "This was the flow of the game up until now. Summarize the last message you wrote. The summary should be between 50 and 70 tokens and include only the most important details needed to understand this part of the story. Focus on key actions, character motivations, and major plot points. Do not add new things or create new details that were not there before"
+    //     })
 
-        const resSummary = await together.chat.completions.create({
-            messages: summaryQuery,
-            model: "google/gemma-2-27b-it",
-            // model: "NousResearch/Nous-Hermes-2-Yi-34B",
-            max_tokens: 70,
-            temperature: 1.3,
-            top_p: 0.7,
-            top_k: 50,
-            repetition_penalty: 1,
-            stop: ["<|eot_id|>","<|eom_id|>"],
-            stream: false
-        })
+    //     const resSummary = await together.chat.completions.create({
+    //         messages: summaryQuery,
+    //         // model: "google/gemma-2-27b-it",
+    //         model: aiModel,
+    //         max_tokens: 70,
+    //         temperature: 1.3,
+    //         top_p: 0.7,
+    //         top_k: 50,
+    //         repetition_penalty: 1,
+    //         stop: ["<|eot_id|>","<|eom_id|>"],
+    //         stream: false
+    //     })
     
-        messages.splice(messages.length - 5, 1, {
-            role: "assistant",
-            content: resSummary.choices[0].message!.content!
-        })
-    }
+    //     messages.splice(messages.length - 5, 1, {
+    //         role: "assistant",
+    //         content: resSummary.choices[0].message!.content!
+    //     })
+    // }
 
     console.log("messages: ", messages)
 

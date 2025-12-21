@@ -9,6 +9,9 @@
       <button @click="canContinue = true" v-if="devMode">
         skip
       </button>
+      <button @click="downloadGame()">
+        Download Game
+      </button>
     </div>
 
 
@@ -91,10 +94,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useGameLogic, GameStatus } from './GameLogic';
+import { computed, ref } from 'vue';
 import FateDisplay from './FateDisplay.vue';
-import { computed } from 'vue';
+import { GameStatus, useGameLogic } from './GameLogic';
 
 const item1 = ref('');
 const item2 = ref('');
@@ -125,6 +127,15 @@ function takeAction() {
   gameLogic.takeAction(action.value);
 
   action.value = ''
+}
+
+async function downloadGame() {
+  const data = await gameLogic.getGameData();
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+  const dlAnchorElem = document.createElement('a');
+  dlAnchorElem.setAttribute("href",     dataStr     );
+  dlAnchorElem.setAttribute("download", "game_data.json");
+  dlAnchorElem.click();
 }
 
 </script>
